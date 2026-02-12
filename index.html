@@ -3,78 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Insta Fix</title>
+    <title>Mizofy Ultimate</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            background: #0095f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-        }
-        button:hover { background: #0074cc; }
-        button:disabled { background: #ccc; }
-        
+        body { font-family: sans-serif; background: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { background: #d62976; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
+        button:disabled { background: #aaa; }
         #result { margin-top: 20px; display: none; }
-        video { width: 100%; border-radius: 8px; margin-top: 10px; }
-        .error { color: red; margin-top: 10px; font-size: 0.9rem; display: none; }
-        .download-btn {
-            display: block;
-            background: #00c853;
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
+        video { width: 100%; border-radius: 10px; background: #000; }
+        .error { color: #d32f2f; background: #ffcdd2; padding: 10px; border-radius: 5px; margin-top: 10px; display: none; font-size: 14px; }
+        .success-btn { display: block; background: #2e7d32; color: white; text-decoration: none; padding: 12px; margin-top: 10px; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 style="margin-top:0;">Mizofy (Fixed)</h2>
-    <input type="text" id="urlInput" placeholder="Paste Instagram Link Here..." value="https://www.instagram.com/reel/DRcWJkoCRvL/?igsh=MWZycjBhMmh3NjZyZw==">
-    <button id="btn" onclick="downloadMedia()">Download</button>
+    <h2 style="margin:0 0 10px; color:#d62976;">Mizofy Downloader</h2>
+    <p style="font-size:14px; color:#666;">Instagram, Reels, TikTok & more</p>
+    
+    <input type="text" id="urlInput" placeholder="Paste link here..." value="">
+    <button id="btn" onclick="startDownload()">Download Now</button>
     
     <div id="errorMsg" class="error"></div>
 
     <div id="result">
         <div id="videoContainer"></div>
-        <a id="dlLink" class="download-btn" target="_blank">Download Video</a>
+        <a id="dlLink" class="success-btn" target="_blank" download="mizofy_video.mp4">💾 Save Video</a>
     </div>
 </div>
 
 <script>
-    async function downloadMedia() {
+    async function startDownload() {
         const input = document.getElementById('urlInput').value.trim();
         const btn = document.getElementById('btn');
         const errorMsg = document.getElementById('errorMsg');
@@ -82,60 +42,65 @@
         const vidContainer = document.getElementById('videoContainer');
         const dlLink = document.getElementById('dlLink');
 
-        // Reset
+        if (!input) return alert("Link toh daal pehle!");
+
+        // Reset UI
         errorMsg.style.display = 'none';
         resultDiv.style.display = 'none';
-        vidContainer.innerHTML = '';
-
-        if (!input) return;
-
         btn.disabled = true;
-        btn.innerText = "Fetching...";
+        btn.innerText = "Processing...";
 
+        // --- SOURCE 1: Tumhari Vercel API ---
         try {
-            // 1. API URL set karna
-            const apiUrl = "https://instaaaa-pi.vercel.app/download?url=" + encodeURIComponent(input);
+            console.log("Trying Source 1...");
+            const api1 = `https://instaaaa-pi.vercel.app/download?url=${encodeURIComponent(input)}`;
+            const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(api1)}`); 
             
-            // 2. PROXY Lagana (Ye zaroori hai "Failed to fetch" hatane ke liye)
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
+            if (response.ok) {
+                const data = await response.json();
+                let link = data.url || (data.data && data.data[0] ? data.data[0].url : null);
+                
+                if (link) {
+                    showVideo(link);
+                    return;
+                }
+            }
+        } catch (e) { console.log("Source 1 failed, trying Backup..."); }
 
-            // 3. Call Fetch
-            const response = await fetch(proxyUrl);
-            
-            if (!response.ok) throw new Error("Server Response Error");
+        // --- SOURCE 2: Cobalt API (The Beast) ---
+        try {
+            btn.innerText = "Using Backup Server...";
+            const response = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://api.cobalt.tools/api/json"), {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ url: input, vQuality: "720" })
+            });
 
             const data = await response.json();
-            
-            console.log("Data:", data); // Check console for structure
-
-            // 4. Data Extract karna (Structure check karke)
-            let finalUrl = null;
-
-            if (data.data && data.data.downloads) {
-                 // Format A
-                finalUrl = data.data.downloads.find(x => x.url).url;
-            } else if (data.data && Array.isArray(data.data)) {
-                // Format B
-                finalUrl = data.data[0].url;
-            } else if (data.url) {
-                // Format C
-                finalUrl = data.url;
+            if (data.url || (data.picker && data.picker[0])) {
+                showVideo(data.url || data.picker[0].url);
+                return;
             }
+        } catch (e) { console.log("Backup failed too."); }
 
-            if (!finalUrl) throw new Error("API responded but no video link found.");
+        // If all failed
+        showError("❌ Link invalid hai ya server busy hai. Baad mein try kar.");
+        btn.disabled = false;
+        btn.innerText = "Download Now";
 
-            // 5. Show Video
-            vidContainer.innerHTML = `<video controls autoplay loop playsinline src="${finalUrl}"></video>`;
-            dlLink.href = finalUrl;
+        function showVideo(url) {
+            vidContainer.innerHTML = `<video controls autoplay src="${url}"></video>`;
+            dlLink.href = url;
             resultDiv.style.display = 'block';
-
-        } catch (err) {
-            console.error(err);
-            errorMsg.innerText = "Error: " + err.message;
-            errorMsg.style.display = 'block';
-        } finally {
             btn.disabled = false;
-            btn.innerText = "Download";
+            btn.innerText = "Download Now";
+        }
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = "Download Now";
         }
     }
 </script>
