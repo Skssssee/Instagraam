@@ -3,81 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Live API</title>
+    <title>Mizofy - Insta Downloader</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #151515; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid #333; text-align: center; }
-        h1 { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 20px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #444; background: #1e1e1e; color: #fff; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #dc2743; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3); }
-        button:disabled { background: #444; opacity: 0.7; }
-        #result { display: none; margin-top: 25px; border-top: 1px solid #333; padding-top: 25px; }
-        video { width: 100%; border-radius: 12px; background: #000; margin-bottom: 15px; }
-        .dl-btn { display: block; background: #00c853; color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; }
-        .loading-text { color: #aaa; font-size: 13px; margin-top: 10px; display: none; }
+        body { font-family: sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #111; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid #333; text-align: center; }
+        h2 { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #dc2743; color: #fff; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #555; }
+        #result { display: none; margin-top: 20px; }
+        video { width: 100%; border-radius: 12px; margin-bottom: 15px; background: #000; }
+        .dl-btn { display: block; background: #00c853; color: white; padding: 14px; text-decoration: none; border-radius: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Mizofy Insta</h1>
-    <input type="text" id="urlInput" placeholder="Paste link here..." value="https://www.instagram.com/reel/DT44NP1E8_L/">
-    <button id="mainBtn" onclick="fetchFromMyAPI()">Download Video</button>
-    <div id="loader" class="loading-text">Fetching from instaaaa-pi...</div>
+    <h2>Mizofy Downloader</h2>
+    <input type="text" id="urlInput" placeholder="Paste Instagram Link..." value="https://www.instagram.com/reel/DUnGAETk1-H/?igsh=MzRlODBiNWFlZA==">
+    <button id="btn" onclick="fetchInsta()">Download Video</button>
 
     <div id="result">
-        <video id="vidPlayer" controls playsinline></video>
-        <a id="saveLink" class="dl-btn" href="#" target="_blank">📥 Download HD Video</a>
+        <video id="player" controls playsinline></video>
+        <a id="save" class="dl-btn" href="#" target="_blank">📥 Save to Gallery</a>
     </div>
 </div>
 
 <script>
-    async function fetchFromMyAPI() {
+    async function fetchInsta() {
         const url = document.getElementById('urlInput').value.trim();
-        const btn = document.getElementById('mainBtn');
-        const loader = document.getElementById('loader');
-        const result = document.getElementById('result');
-        const vid = document.getElementById('vidPlayer');
-        const dl = document.getElementById('saveLink');
+        const btn = document.getElementById('btn');
+        const res = document.getElementById('result');
+        const vid = document.getElementById('player');
+        const dl = document.getElementById('save');
 
         if (!url) return alert("Link daal pehle!");
 
-        // Reset UI
         btn.disabled = true;
-        loader.style.display = 'block';
-        result.style.display = 'none';
+        btn.innerText = "Fetching Video...";
+        res.style.display = 'none';
 
-        // TERI API KA URL (Using AllOrigins to bypass CORS)
+        // TERI LIVE API (Bina CORS error ke)
         const myApi = `https://instaaaa-pi.vercel.app/download?url=${encodeURIComponent(url)}`;
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(myApi)}`;
+        const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(myApi)}`;
 
         try {
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error("API Connection Failed");
-
+            const response = await fetch(proxy);
             const data = await response.json();
-            console.log("Response Received:", data);
 
-            // TERE JSON STRUCTURE KE HISAB SE DATA NIKALNA
-            // Priority 1: clean_download_url
-            // Priority 2: all_results -> fsmvid -> medias
-            let downloadUrl = data.clean_download_url || 
-                              (data.all_results?.fsmvid?.data?.medias?.[0]?.url) ||
-                              (data.all_results?.snapdownloader?.video);
+            // Tere JSON ka exact path
+            const videoLink = data.clean_download_url || 
+                             data.all_results?.snapdownloader?.video || 
+                             data.all_results?.nuelink?.data?.video_url;
 
-            if (downloadUrl) {
-                vid.src = downloadUrl;
-                dl.href = downloadUrl;
-                result.style.display = 'block';
+            if (videoLink) {
+                vid.src = videoLink;
+                dl.href = videoLink;
+                res.style.display = 'block';
             } else {
-                alert("API ne link nahi bheja. JSON check kar.");
+                alert("Link nahi mila, API check kar!");
             }
         } catch (err) {
-            console.error(err);
-            alert("Error: API online hai par browser block kar raha hai. VPN ya Proxy change kar.");
+            alert("API Response Error!");
         } finally {
             btn.disabled = false;
-            loader.style.display = 'none';
+            btn.innerText = "Download Video";
         }
     }
 </script>
