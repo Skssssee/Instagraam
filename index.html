@@ -3,96 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Live Link</title>
+    <title>Mizofy - Insta-DLX</title>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #111; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid #333; text-align: center; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #e91e63; color: #fff; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #555; }
-        #res { display: none; margin-top: 20px; }
-        video { width: 100%; border-radius: 10px; margin-bottom: 15px; }
-        .dl { display: block; background: #00c853; color: white; padding: 15px; text-decoration: none; border-radius: 10px; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #111; padding: 25px; border-radius: 20px; width: 95%; max-width: 420px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 20px; font-size: 26px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #dc2743; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #ff2e4e; box-shadow: 0 0 20px rgba(220, 39, 67, 0.4); }
+        button:disabled { background: #444; cursor: not-allowed; }
+        #res { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; animation: slideUp 0.4s ease; }
+        video { width: 100%; border-radius: 12px; background: #000; margin-bottom: 15px; border: 1px solid #444; }
+        .dl-btn { display: block; background: #00c853; color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; transition: 0.3s; }
+        .dl-btn:hover { background: #00e676; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>Mizofy Downloader</h2>
-    <input type="text" id="url" placeholder="Paste Instagram Link..." value="https://www.instagram.com/reel/DUnGAETk1-H/">
-    <button id="btn" onclick="hitApi()">Download Video</button>
+    <input type="text" id="urlInput" placeholder="Paste Instagram Reel Link..." value="">
+    <button id="btn" onclick="fetchInstaSave()">Download Video</button>
 
     <div id="res">
         <video id="vid" controls playsinline></video>
-        <a id="save" class="dl" href="#" target="_blank">Download HD</a>
+        <a id="save" class="dl-btn" href="#" target="_blank">📥 Save Video (HD)</a>
     </div>
 </div>
 
 <script>
-    async function hitApi() {
-        const urlInput = document.getElementById('url').value.trim();
+    async function fetchInstaSave() {
+        const inp = document.getElementById('urlInput').value.trim();
         const btn = document.getElementById('btn');
         const res = document.getElementById('res');
         const vid = document.getElementById('vid');
         const save = document.getElementById('save');
 
-        if (!urlInput) return alert("Link daal!");
+        if (!inp) return alert("Link toh daal bhai!");
 
         btn.disabled = true;
-        btn.innerText = "Calling API...";
+        btn.innerText = "Fetching from DLX...";
         res.style.display = 'none';
 
-        // 1. Direct API Call Attempt
-        const apiUrl = `https://instaaaa-pi.vercel.app/download?url=${encodeURIComponent(urlInput)}`;
+        // TERA DEDICATED ENDPOINT
+        const apiUrl = `https://insta-dlx.vercel.app/api/instasave?url=${encodeURIComponent(inp)}`;
+        
+        // CORS Proxy (Kyuki Vercel Browser calls block karta hai)
+        const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
 
         try {
-            // Hum direct fetch kar rahe hain bina kisi proxy ke
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                mode: 'cors', // CORS enable karne ke liye
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            const response = await fetch(proxy);
+            if (!response.ok) throw new Error("API Down");
 
-            if (!response.ok) throw new Error("CORS or Server Error");
+            const result = await response.json();
+            
+            // TERE JSON STRUCTURE: data.video_urls[0]
+            const videoLink = result.data?.video_urls?.[0];
 
-            const data = await response.json();
-            console.log("Response:", data);
-
-            const link = data.clean_download_url || 
-                         data.all_results?.fsmvid?.data?.medias?.[0]?.url;
-
-            if (link) {
-                vid.src = link;
-                save.href = link;
+            if (videoLink) {
+                vid.src = videoLink;
+                save.href = videoLink;
                 res.style.display = 'block';
             } else {
-                alert("API call successful par link nahi mila!");
+                alert("Video link nahi mila. Check if private or invalid.");
             }
-
         } catch (err) {
-            console.error("Direct call failed, trying forced proxy...");
-            
-            // 2. Agar direct fail ho, toh ye wala method try karo (CORS bypass)
-            try {
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-                const proxiedResponse = await fetch(proxyUrl);
-                const proxyData = await proxiedResponse.json();
-                const actualData = JSON.parse(proxyData.contents); // AllOrigins JSON ko string mein wrap karta hai
-
-                const link = actualData.clean_download_url || actualData.all_results?.fsmvid?.data?.medias?.[0]?.url;
-
-                if (link) {
-                    vid.src = link;
-                    save.href = link;
-                    res.style.display = 'block';
-                } else {
-                    alert("API responding par structure match nahi kar raha.");
-                }
-            } catch (proxyErr) {
-                alert("API call fail ho rahi hai. Apne Vercel dashboard mein CORS allow karo!");
-            }
+            console.error(err);
+            alert("Error: API respond nahi kar rahi ya CORS block hai.");
         } finally {
             btn.disabled = false;
             btn.innerText = "Download Video";
