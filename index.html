@@ -3,102 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Insta Ultra</title>
+    <title>Mizofy - Live API</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #1a1a1a; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; text-align: center; }
-        h2 { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #444; background: #252525; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #dc2743; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #ff2e4e; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #result { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
-        video { width: 100%; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .dl-link { display: block; background: #28a745; color: #fff; padding: 14px; text-decoration: none; border-radius: 10px; font-weight: bold; }
-        .error { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; border: 1px solid #ff4d4d; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #151515; padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid #333; text-align: center; }
+        h1 { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 20px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #444; background: #1e1e1e; color: #fff; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #dc2743; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3); }
+        button:disabled { background: #444; opacity: 0.7; }
+        #result { display: none; margin-top: 25px; border-top: 1px solid #333; padding-top: 25px; }
+        video { width: 100%; border-radius: 12px; background: #000; margin-bottom: 15px; }
+        .dl-btn { display: block; background: #00c853; color: white; padding: 15px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; }
+        .loading-text { color: #aaa; font-size: 13px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Mizofy Downloader</h2>
-    <input type="text" id="urlInput" placeholder="Paste Instagram Reel Link..." value="https://www.instagram.com/reel/DUlKJISAI7-/">
-    <button id="dlBtn" onclick="fetchVideo()">Get Video</button>
-    <div id="errBox" class="error"></div>
+    <h1>Mizofy Insta</h1>
+    <input type="text" id="urlInput" placeholder="Paste link here..." value="https://www.instagram.com/reel/DT44NP1E8_L/">
+    <button id="mainBtn" onclick="fetchFromMyAPI()">Download Video</button>
+    <div id="loader" class="loading-text">Fetching from instaaaa-pi...</div>
 
     <div id="result">
-        <video id="videoPlayer" controls playsinline></video>
-        <a id="downloadBtn" class="dl-link" href="#" target="_blank">📥 Download HD Video</a>
+        <video id="vidPlayer" controls playsinline></video>
+        <a id="saveLink" class="dl-btn" href="#" target="_blank">📥 Download HD Video</a>
     </div>
 </div>
 
 <script>
-    async function fetchVideo() {
+    async function fetchFromMyAPI() {
         const url = document.getElementById('urlInput').value.trim();
-        const btn = document.getElementById('dlBtn');
-        const err = document.getElementById('errBox');
-        const res = document.getElementById('result');
-        const vid = document.getElementById('videoPlayer');
-        const dl = document.getElementById('downloadBtn');
+        const btn = document.getElementById('mainBtn');
+        const loader = document.getElementById('loader');
+        const result = document.getElementById('result');
+        const vid = document.getElementById('vidPlayer');
+        const dl = document.getElementById('saveLink');
 
         if (!url) return alert("Link daal pehle!");
 
-        // UI States
-        err.style.display = 'none';
-        res.style.display = 'none';
+        // Reset UI
         btn.disabled = true;
-        btn.innerText = "Searching Server...";
+        loader.style.display = 'block';
+        result.style.display = 'none';
 
-        const apiUrl = `https://instaaaa-pi.vercel.app/download?url=${encodeURIComponent(url)}`;
-        
-        // Proxy List (Trying multiple ways to avoid "Failed to Fetch")
-        const proxyUrls = [
-            `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
-            `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`
-        ];
+        // TERI API KA URL (Using AllOrigins to bypass CORS)
+        const myApi = `https://instaaaa-pi.vercel.app/download?url=${encodeURIComponent(url)}`;
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(myApi)}`;
 
-        let finalData = null;
+        try {
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error("API Connection Failed");
 
-        for (let proxy of proxyUrls) {
-            try {
-                const response = await fetch(proxy);
-                if (response.ok) {
-                    finalData = await response.json();
-                    if (finalData) break;
-                }
-            } catch (e) { console.warn("Proxy failed, trying next..."); }
-        }
+            const data = await response.json();
+            console.log("Response Received:", data);
 
-        if (finalData) {
-            // DEEP SEARCH LOGIC - Tere JSON ke hisaab se link nikaalna
-            let videoLink = finalData.clean_download_url || 
-                            finalData.all_results?.snapdownloader?.video || 
-                            finalData.all_results?.nuelink?.data?.video_url ||
-                            finalData.all_results?.fsmvid?.data?.medias?.[0]?.url ||
-                            finalData.all_results?.instasave?.data?.video_urls?.[0];
+            // TERE JSON STRUCTURE KE HISAB SE DATA NIKALNA
+            // Priority 1: clean_download_url
+            // Priority 2: all_results -> fsmvid -> medias
+            let downloadUrl = data.clean_download_url || 
+                              (data.all_results?.fsmvid?.data?.medias?.[0]?.url) ||
+                              (data.all_results?.snapdownloader?.video);
 
-            if (videoLink) {
-                // Success
-                vid.src = videoLink;
-                dl.href = videoLink;
-                res.style.display = 'block';
-                btn.disabled = false;
-                btn.innerText = "Get Video";
+            if (downloadUrl) {
+                vid.src = downloadUrl;
+                dl.href = downloadUrl;
+                result.style.display = 'block';
             } else {
-                showError("Video link is hidden or API failed to bypass.");
+                alert("API ne link nahi bheja. JSON check kar.");
             }
-        } else {
-            showError("API down hai ya link private hai.");
+        } catch (err) {
+            console.error(err);
+            alert("Error: API online hai par browser block kar raha hai. VPN ya Proxy change kar.");
+        } finally {
+            btn.disabled = false;
+            loader.style.display = 'none';
         }
-    }
-
-    function showError(msg) {
-        const err = document.getElementById('errBox');
-        const btn = document.getElementById('dlBtn');
-        err.innerText = "Error: " + msg;
-        err.style.display = 'block';
-        btn.disabled = false;
-        btn.innerText = "Get Video";
     }
 </script>
 
