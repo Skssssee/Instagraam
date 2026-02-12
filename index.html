@@ -3,145 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Universal Instagram Downloader</title>
+    <title>Mizofy - Instagram Downloader | Videos, Reels, & Photos</title>
+    <meta name="description" content="Mizofy is the fastest online tool to download Instagram Videos, Photos, Reels, and IGTV. Secure and free.">
+    
     <style>
         :root {
-            --mizofy-grad: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            --success: #28a745;
-            --dark: #1a1a1a;
+            --mizofy-grad: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --bg-gray: #f8f9fa;
+            --white: #ffffff;
         }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8f9fa; color: #333; }
-        header { background: #fff; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo { font-size: 30px; font-weight: 800; background: var(--mizofy-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        
-        .hero { padding: 40px 20px; text-align: center; background: #fff; }
-        .search-container { max-width: 650px; margin: 0 auto; }
-        input { width: 100%; padding: 18px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .dl-btn { width: 100%; margin-top: 15px; padding: 18px; border: none; border-radius: 12px; background: var(--mizofy-grad); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; }
 
-        /* RESULT AREA */
-        #result { display: none; margin-top: 30px; animation: fadeInUp 0.5s ease; }
-        .media-card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; text-align: left; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg-gray); color: #333; }
         
-        /* Video Fix */
-        .video-box { width: 100%; border-radius: 12px; background: #000; overflow: hidden; margin-bottom: 15px; position: relative; }
-        video { width: 100%; display: block; }
+        /* Header */
+        header { background: var(--white); padding: 15px 0; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 30px; font-weight: 800; background: var(--mizofy-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+
+        /* Hero Area */
+        .hero { background: var(--white); padding: 50px 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 30px; }
         
-        /* Extra Info Styling */
-        .info-badge { display: inline-block; background: #eee; padding: 5px 12px; border-radius: 5px; font-size: 12px; font-weight: 700; margin-bottom: 10px; color: #555; }
-        .thumb-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; border: 1px solid #ddd; }
-        .flex-info { display: flex; align-items: center; margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; background: #eee; border-radius: 25px; font-size: 14px; cursor: pointer; border: none; font-weight: 600; }
+        .tab.active { background: var(--mizofy-grad); color: #fff; }
+
+        /* Search Input */
+        .search-box { max-width: 650px; margin: 0 auto; position: relative; }
+        .input-group { display: flex; gap: 10px; flex-direction: column; }
+        @media(min-width: 600px) { .input-group { flex-direction: row; } }
+
+        input { flex: 1; padding: 18px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; outline: none; }
+        input:focus { border-color: #dc2743; }
         
-        .save-btn { display: block; background: var(--success); color: #fff; padding: 15px; text-align: center; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 18px; }
+        .btn-download { padding: 18px 40px; border: none; border-radius: 12px; background: var(--mizofy-grad); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(221, 36, 118, 0.3); }
+
+        /* Result View */
+        #result { display: none; margin-top: 40px; }
+        .media-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+        video { width: 100%; border-radius: 12px; background: #000; margin-bottom: 15px; }
+        .btn-save { display: block; background: #28a745; color: #fff; padding: 15px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 1.1rem; }
+
+        /* SEO Content Section */
+        .content-section { max-width: 900px; margin: 60px auto; padding: 0 20px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 40px 0; }
+        .feature-box { background: var(--white); padding: 25px; border-radius: 15px; border: 1px solid #eee; }
         
-        /* SEO Content */
-        .content { max-width: 900px; margin: 50px auto; padding: 0 20px; }
-        .faq { background: #fff; padding: 30px; border-radius: 20px; margin-top: 40px; }
-        footer { background: var(--dark); color: #fff; text-align: center; padding: 40px; margin-top: 60px; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* FAQ Section */
+        .faq-box { background: var(--white); padding: 30px; border-radius: 20px; margin-top: 50px; }
+        .faq-box h3 { color: var(--text-dark); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 25px; }
+
+        footer { background: #111; color: #fff; text-align: center; padding: 40px 20px; margin-top: 60px; }
     </style>
 </head>
 <body>
 
-<header><a href="#" class="logo">Mizofy</a></header>
+<header>
+    <a href="/" class="logo">Mizofy</a>
+</header>
 
-<div class="hero">
-    <div class="search-container">
-        <h1>Instagram Videos & Photos Downloader</h1>
-        <input type="text" id="urlInput" placeholder="Insert Instagram link here..." value="">
-        <button id="dlBtn" class="dl-btn" onclick="fetchMizofyData()">DOWNLOAD</button>
+<section class="hero">
+    <div class="search-box">
+        <h1>Instagram Videos and Photos Download</h1>
+        
+        <div class="tabs">
+            <button class="tab">Video</button>
+            <button class="tab">Photo</button>
+            <button class="tab active">Reels</button>
+            <button class="tab">Stories</button>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="urlInput" placeholder="Insert instagram link here">
+            <button id="mainBtn" class="btn-download" onclick="startMizofyDownload()">DOWNLOAD</button>
+        </div>
 
         <div id="result">
             <div class="media-card">
-                <span class="info-badge" id="sourceBadge">SOURCE: INSTAGRAM</span>
-                
-                <div class="flex-info">
-                    <img id="thumbImg" src="" class="thumb-preview" alt="Thumbnail">
-                    <div>
-                        <div style="font-weight: 800; font-size: 14px;">Media Ready!</div>
-                        <div style="font-size: 12px; color: #666;" id="resTime">Processed in 0s</div>
-                    </div>
-                </div>
-
-                <div class="video-box">
-                    <video id="vidPlayer" controls playsinline poster=""></video>
-                </div>
-
-                <a id="saveBtn" class="save-btn" href="#" target="_blank">Download HD File</a>
+                <video id="vidPlayer" controls playsinline poster=""></video>
+                <a id="downloadBtn" class="btn-save" href="#" target="_blank" download="mizofy_video.mp4">Download HD File</a>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="content">
-    <h2>Mizofy - All-in-One Download Solution</h2>
-    <p>Mizofy is an online web tool that helps you download Instagram Videos, Photos, Reels, and IGTV. It is optimized for mobile, tablet, and desktop users.</p>
+<div class="content-section">
+    <h2>Mizofy - Your Ultimate Instagram Downloader</h2>
+    <p>Mizofy is an online web tool that helps you download Instagram Videos, Photos, Reels, and IGTV. Our tool is designed to be easy to use on any device, such as a mobile phone, tablet, or computer.</p>
 
-    <div class="faq">
-        <h2>FAQ</h2>
-        <h3>Is Mizofy free?</h3>
-        <p>Yes, Mizofy allows unlimited downloads without any daily limits.</p>
-        <h3>Which devices are supported?</h3>
-        <p>Mizofy works on any modern browser across Windows, Android, and iOS.</p>
+    <div class="feature-grid">
+        <div class="feature-box">
+            <h3>Fast download</h3>
+            <p>Our Mizofy servers are optimized to provide you with the fastest download speeds available on the web.</p>
+        </div>
+        <div class="feature-box">
+            <h3>Support for all devices</h3>
+            <p>Whether you're on a mobile, tablet, or desktop, Mizofy has got you covered with a seamless experience.</p>
+        </div>
+        <div class="feature-box">
+            <h3>High quality</h3>
+            <p>Download Instagram content in its original quality without any loss in resolution or frames.</p>
+        </div>
+    </div>
+
+    <div class="faq-box">
+        <h2>Frequently asked questions (FAQ)</h2>
+        
+        <h3>What exactly is Mizofy?</h3>
+        <p>Mizofy is a browser-based helper that lets you save public Instagram content - videos, photos, Reels, Stories, IGTV and carousels - to your own device for offline viewing. It works straight from the website; no software install is required.</p>
+        
+        <h3>Is downloading from Instagram legal?</h3>
+        <p>Saving public posts for personal use is generally allowed, but copyright always belongs to the creator. Please keep the files private unless you have permission.</p>
+
+        <h3>Are there any limits on daily downloads?</h3>
+        <p>None at all. Mizofy allows you to download one item or a hundred - our servers don’t impose any daily caps.</p>
+        
+        <h3>Can I grab content from private accounts?</h3>
+        <p>Sorry, no. We respect user privacy, so only public posts are accessible through Mizofy.</p>
     </div>
 </div>
 
 <footer>
-    <p>&copy; 2026 Mizofy. Digital download management tool.</p>
+    <p>&copy; 2020-2026 Mizofy. All rights reserved.</p>
+    <p>Digital download management tool by Mizofy</p>
 </footer>
 
 <script>
-    async function fetchMizofyData() {
-        const url = document.getElementById('urlInput').value.trim();
-        const btn = document.getElementById('dlBtn');
-        const resArea = document.getElementById('result');
-        const vid = document.getElementById('vidPlayer');
-        const thumb = document.getElementById('thumbImg');
-        const dl = document.getElementById('saveBtn');
-        const sourceB = document.getElementById('sourceBadge');
-        const timeB = document.getElementById('resTime');
+    async function startMizofyDownload() {
+        const urlValue = document.getElementById('urlInput').value.trim();
+        const btn = document.getElementById('mainBtn');
+        const resultArea = document.getElementById('result');
+        const video = document.getElementById('vidPlayer');
+        const saveLink = document.getElementById('downloadBtn');
 
-        if (!url) return alert("Please paste a link!");
+        if (!urlValue) return alert("Please paste an Instagram link!");
 
+        // Loading State
         btn.disabled = true;
-        btn.innerText = "Processing...";
-        resArea.style.display = 'none';
+        btn.innerText = "FETCHING...";
+        resultArea.style.display = 'none';
 
-        // API Endpoint
-        const apiUrl = `https://insta-dlx.vercel.app/api/instasave?url=${encodeURIComponent(url)}`;
-        const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+        // TERA DEDICATED API ENDPOINT
+        const API_URL = `https://insta-dlx.vercel.app/api/instasave?url=${encodeURIComponent(urlValue)}`;
+        
+        // Proxy to avoid CORS issues
+        const finalUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(API_URL)}`;
 
         try {
-            const response = await fetch(proxy);
+            const response = await fetch(finalUrl);
             const json = await response.json();
+            
+            // LOGIC FIX: Target 'data.video_urls[0]' specifically
+            const videoLink = json.data?.video_urls?.[0];
+            const thumbLink = json.data?.thumbnail;
 
-            if (json.success && json.data) {
-                // Extracting Extra Info from JSON
-                const videoUrl = json.data.video_urls[0];
-                const thumbUrl = json.data.thumbnail;
-                const sourceName = json.source || "INSTASAVE";
-                const timeTaken = json.response_time || "N/A";
-
-                // Update UI
-                vid.src = videoUrl;
-                vid.poster = thumbUrl; // Fix: Show thumbnail while video loads
-                thumb.src = thumbUrl;
-                dl.href = videoUrl;
-                sourceB.innerText = `SOURCE: ${sourceName.toUpperCase()}`;
-                timeB.innerText = `Processed in ${timeTaken}`;
-
-                // Display
-                resArea.style.display = 'block';
+            if (videoLink) {
+                video.src = videoLink;
+                video.poster = thumbLink || ""; // Set thumbnail as poster
+                saveLink.href = videoLink;
                 
-                // Force video load to prevent "black break"
-                vid.load(); 
-                
+                resultArea.style.display = 'block';
+                btn.innerText = "DOWNLOAD";
             } else {
-                alert("Mizofy: No content found in this link.");
+                alert("Mizofy: Link not found. Please try another post.");
             }
         } catch (err) {
-            alert("Mizofy: API Connection Error.");
+            console.error(err);
+            alert("Mizofy Connection Error. Please try again.");
         } finally {
             btn.disabled = false;
             btn.innerText = "DOWNLOAD";
