@@ -3,200 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mizofy - Insta Downloader</title>
+    <title>Mizofy - Insta Fix</title>
     <style>
-        :root {
-            --primary: #d62976;
-            --gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            --bg: #fafafa;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
+            font-family: sans-serif;
+            background: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
         }
-
         .card {
             background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             width: 90%;
-            max-width: 500px;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
             text-align: center;
         }
-
-        h1 {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-            font-size: 2rem;
-        }
-
-        .input-box {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
         input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
-        input:focus { border-color: var(--primary); }
-
         button {
-            background: var(--primary);
+            background: #0095f6;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:disabled { background: #ccc; cursor: wait; }
-
-        #result {
-            display: none;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .media-box {
-            width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            background: black;
-            margin-bottom: 15px;
-        }
-
-        video, img { width: 100%; display: block; }
-
-        .dl-btn {
-            display: inline-block;
-            background: #25D366;
-            color: white;
-            text-decoration: none;
             padding: 10px 20px;
             border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
             font-weight: bold;
         }
-
-        .error { color: red; font-size: 14px; display: none; margin-top: 10px; }
+        button:hover { background: #0074cc; }
+        button:disabled { background: #ccc; }
+        
+        #result { margin-top: 20px; display: none; }
+        video { width: 100%; border-radius: 8px; margin-top: 10px; }
+        .error { color: red; margin-top: 10px; font-size: 0.9rem; display: none; }
+        .download-btn {
+            display: block;
+            background: #00c853;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Mizofy API</h1>
-        <p style="color:#666;">Paste Instagram/Reels Link</p>
+<div class="card">
+    <h2 style="margin-top:0;">Mizofy (Fixed)</h2>
+    <input type="text" id="urlInput" placeholder="Paste Instagram Link Here..." value="https://www.instagram.com/reel/DRcWJkoCRvL/?igsh=MWZycjBhMmh3NjZyZw==">
+    <button id="btn" onclick="downloadMedia()">Download</button>
+    
+    <div id="errorMsg" class="error"></div>
 
-        <div class="input-box">
-            <input type="text" id="url" placeholder="https://instagram.com/reel/...">
-            <button id="btn" onclick="download()">Go</button>
-        </div>
-
-        <p class="error" id="errorMsg"></p>
-
-        <div id="result">
-            <div class="media-box" id="mediaContainer"></div>
-            <a id="dlLink" class="dl-btn" href="#" target="_blank">Download HD</a>
-        </div>
+    <div id="result">
+        <div id="videoContainer"></div>
+        <a id="dlLink" class="download-btn" target="_blank">Download Video</a>
     </div>
+</div>
 
-    <script>
-        // --- YE RAHI TUMHARI API ---
-        const API_BASE = "https://instaaaa-pi.vercel.app/download";
+<script>
+    async function downloadMedia() {
+        const input = document.getElementById('urlInput').value.trim();
+        const btn = document.getElementById('btn');
+        const errorMsg = document.getElementById('errorMsg');
+        const resultDiv = document.getElementById('result');
+        const vidContainer = document.getElementById('videoContainer');
+        const dlLink = document.getElementById('dlLink');
 
-        async function download() {
-            const urlInput = document.getElementById('url').value.trim();
-            const btn = document.getElementById('btn');
-            const resultDiv = document.getElementById('result');
-            const errorMsg = document.getElementById('errorMsg');
-            const mediaContainer = document.getElementById('mediaContainer');
-            const dlLink = document.getElementById('dlLink');
+        // Reset
+        errorMsg.style.display = 'none';
+        resultDiv.style.display = 'none';
+        vidContainer.innerHTML = '';
 
-            // Reset UI
-            resultDiv.style.display = 'none';
-            errorMsg.style.display = 'none';
-            mediaContainer.innerHTML = '';
+        if (!input) return;
 
-            if (!urlInput) {
-                showError("Please paste a link first");
-                return;
+        btn.disabled = true;
+        btn.innerText = "Fetching...";
+
+        try {
+            // 1. API URL set karna
+            const apiUrl = "https://instaaaa-pi.vercel.app/download?url=" + encodeURIComponent(input);
+            
+            // 2. PROXY Lagana (Ye zaroori hai "Failed to fetch" hatane ke liye)
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
+
+            // 3. Call Fetch
+            const response = await fetch(proxyUrl);
+            
+            if (!response.ok) throw new Error("Server Response Error");
+
+            const data = await response.json();
+            
+            console.log("Data:", data); // Check console for structure
+
+            // 4. Data Extract karna (Structure check karke)
+            let finalUrl = null;
+
+            if (data.data && data.data.downloads) {
+                 // Format A
+                finalUrl = data.data.downloads.find(x => x.url).url;
+            } else if (data.data && Array.isArray(data.data)) {
+                // Format B
+                finalUrl = data.data[0].url;
+            } else if (data.url) {
+                // Format C
+                finalUrl = data.url;
             }
 
-            // Loading State
-            btn.innerText = "Checking...";
-            btn.disabled = true;
+            if (!finalUrl) throw new Error("API responded but no video link found.");
 
-            try {
-                // 1. Construct URL (GET Request)
-                const targetUrl = `${API_BASE}?url=${encodeURIComponent(urlInput)}`;
-                
-                // 2. Fetch Data
-                const response = await fetch(targetUrl);
-                
-                if (!response.ok) throw new Error("Server Error or Bad Link");
-                
-                const data = await response.json();
-                console.log("API Response:", data); // Debugging ke liye console check kar lena
+            // 5. Show Video
+            vidContainer.innerHTML = `<video controls autoplay loop playsinline src="${finalUrl}"></video>`;
+            dlLink.href = finalUrl;
+            resultDiv.style.display = 'block';
 
-                // 3. Parse Response (Adjusting for common Vercel API formats)
-                // Data format usually: { data: { url: "..." } } or { url: "..." }
-                let videoUrl = null;
-                let isVideo = true;
-
-                if (data.data && data.data.length > 0) {
-                    // Agar response array hai (carousel/album)
-                    const firstItem = data.data.find(item => item.type === 'video') || data.data[0];
-                    videoUrl = firstItem.url;
-                    if (firstItem.type === 'image') isVideo = false;
-                } else if (data.url) {
-                    videoUrl = data.url;
-                } else if (data.download_url) {
-                    videoUrl = data.download_url;
-                }
-
-                if (!videoUrl) throw new Error("No media found via this API.");
-
-                // 4. Show Result
-                if (isVideo) {
-                    mediaContainer.innerHTML = `<video controls autoplay loop playsinline src="${videoUrl}"></video>`;
-                } else {
-                    mediaContainer.innerHTML = `<img src="${videoUrl}" alt="Insta Image">`;
-                }
-
-                dlLink.href = videoUrl;
-                resultDiv.style.display = 'block';
-
-            } catch (err) {
-                console.error(err);
-                showError("Failed: " + err.message);
-            } finally {
-                btn.innerText = "Go";
-                btn.disabled = false;
-            }
+        } catch (err) {
+            console.error(err);
+            errorMsg.innerText = "Error: " + err.message;
+            errorMsg.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Download";
         }
-
-        function showError(msg) {
-            const el = document.getElementById('errorMsg');
-            el.innerText = msg;
-            el.style.display = 'block';
-        }
-    </script>
+    }
+</script>
 
 </body>
 </html>
