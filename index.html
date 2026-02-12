@@ -1,407 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Mizofy - Instagram, TikTok, YouTube, Facebook & Spotify Downloader</title>
-    <meta name="description" content="Mizofy is the best online downloader. Download Photos, Videos, Reels, Stories from Instagram, TikTok (No Watermark), YouTube, and Facebook. Fast, Free & Secure.">
-    <meta name="keywords" content="Mizofy, Instagram Downloader, TikTok Downloader, YouTube Video Download, Reels Downloader, IGTV, Story Saver, Facebook Video, Spotify to MP3">
-    <meta name="robots" content="index, follow">
-
-    <style>
-        /* --- SNAPINSTA THEME CSS --- */
-        :root {
-            --gradient-bg: linear-gradient(90deg, #1CB5E0 0%, #000851 100%); /* Deep Blue/Cyan style */
-            --gradient-btn: linear-gradient(90deg, #FF512F 0%, #DD2476 100%); /* Pink/Red Button */
-            --text-dark: #333;
-            --text-light: #666;
-            --bg-body: #f9f9f9;
-            --white: #ffffff;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; padding: 0; }
-
-        /* HEADER */
-        header {
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            padding: 15px 0;
-            position: relative;
-            z-index: 10;
-        }
-        .container {
-            width: 90%;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .nav-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: var(--gradient-btn);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        /* HERO SECTION (The Colorful Part) */
-        .hero-section {
-            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); /* Snapinsta Blue Vibe */
-            padding: 60px 0 100px; /* Extra padding bottom for overlap */
-            text-align: center;
-            color: white;
-        }
-        .hero-title {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        .hero-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
-        /* INPUT BOX CONTAINER */
-        .search-container {
-            background: var(--white);
-            max-width: 800px;
-            margin: -60px auto 40px; /* Overlaps the hero section */
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            position: relative;
-        }
-
-        /* TABS (Visual only) */
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .tab-item {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #555;
-            padding: 8px 15px;
-            background: #f0f2f5;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .tab-item.active {
-            background: #e1f5fe;
-            color: #0288d1;
-        }
-        .tab-item:hover { background: #e0e0e0; }
-
-        /* INPUT FIELD & BUTTON */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        @media (min-width: 768px) { .input-group { flex-direction: row; } }
-
-        .input-wrapper {
-            flex: 1;
-            position: relative;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 18px 20px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-        input:focus { border-color: #0072ff; }
-
-        .paste-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #f0f2f5;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .paste-btn:hover { background: #e4e6eb; }
-
-        .btn-download {
-            background: var(--gradient-btn);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 5px 15px rgba(221, 36, 118, 0.3);
-            transition: 0.3s;
-        }
-        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(221, 36, 118, 0.4); }
-        .btn-download:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
-
-        /* CONTENT SECTIONS */
-        .section-content {
-            padding: 40px 0;
-            color: var(--text-dark);
-        }
-        .content-box {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        }
-        h2 { font-size: 1.8rem; margin-bottom: 20px; color: #111; }
-        h3 { font-size: 1.3rem; margin-top: 25px; margin-bottom: 10px; color: #333; }
-        p { margin-bottom: 15px; color: var(--text-light); }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .feature-item {
-            background: #fcfcfc;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-        .feature-item h4 { margin: 0 0 10px 0; color: #0072ff; font-size: 1.1rem; }
-
-        /* RESULT AREA */
-        #resultArea {
-            display: none;
-            margin-top: 30px;
-            text-align: center;
-            border-top: 1px solid #eee;
-            padding-top: 30px;
-        }
-        .media-preview {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin: 20px 0;
-        }
-        
-        .dl-button-link {
-            display: inline-block;
-            background: #00b09b; /* Green for download */
-            background: linear-gradient(to right, #00b09b, #96c93d);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 15px;
-            box-shadow: 0 4px 10px rgba(0, 176, 155, 0.3);
-        }
-
-        /* ERROR & LOADER */
-        .error-msg { color: #dc3545; background: #ffe6e6; padding: 10px; border-radius: 5px; display: none; margin-top: 15px; }
-        .loader {
-            display: none;
-            margin: 20px auto;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0072ff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* FOOTER */
-        footer {
-            background: #f0f2f5;
-            padding: 40px 0;
-            text-align: center;
-            margin-top: 50px;
-            border-top: 1px solid #ddd;
-        }
-        .footer-links a { margin: 0 10px; color: #666; font-size: 0.9rem; }
-
-        /* Fallback Card */
-        .fallback-card {
-            background: #f8f9fa;
-            border: 2px dashed #ccc;
-            padding: 30px;
-            border-radius: 10px;
-            display: none;
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="container nav-flex">
-            <div class="logo">Mizofy</div>
-            <div style="font-weight: 600; color: #555;">Universal Downloader</div>
-        </div>
-    </header>
-
-    <section class="hero-section">
-        <div class="container">
-            <h1 class="hero-title">Mizofy - Universal Media Downloader</h1>
-            <p class="hero-subtitle">Download Photos, Videos, Reels, Stories from Instagram, TikTok, YouTube & Spotify</p>
-        </div>
-    </section>
-
-    <section class="container">
-        <div class="search-container">
-            
-            <div class="tabs">
-                <div class="tab-item active">All in One</div>
-                <div class="tab-item">Video</div>
-                <div class="tab-item">Photo</div>
-                <div class="tab-item">Reels</div>
-                <div class="tab-item">Stories</div>
-                <div class="tab-item">Audio</div>
-            </div>
-
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <input type="text" id="urlInput" placeholder="Paste URL Instagram, TikTok, YouTube...">
-                    <button class="paste-btn" onclick="pasteFromClipboard()">📋 Paste</button>
-                </div>
-                <button class="btn-download" id="submitBtn" onclick="fetchMedia()">Download</button>
-            </div>
-
-            <div class="loader" id="loader"></div>
-            <div id="errorMsg" class="error-msg"></div>
-
-            <div id="resultArea">
-                <h3 id="resTitle">Media Title</h3>
-                <p id="resAuthor">Mizofy Downloader</p>
-
-                <div id="playerContainer"></div>
-
-                <div id="fallbackCard" class="fallback-card">
-                    <div style="font-size: 3rem;">📦</div>
-                    <div style="font-weight:bold; margin-top:10px;">File Ready for Download</div>
-                    <p style="font-size:0.9rem; color:#666;">High Quality Media Detected</p>
-                </div>
-
-                <a href="#" id="dlButton" class="dl-button-link" target="_blank">⬇️ Download File</a>
-            </div>
-
-        </div>
-    </section>
-
-    <section class="section-content">
-        <div class="container">
-            
-            <div class="content-box">
-                <h2>Mizofy - Universal Media Downloader</h2>
-                <p>Mizofy is an online media downloader, developed with the purpose of helping users download photos and videos from Instagram, TikTok, YouTube, Spotify, and Facebook to their phones and computers easily without any problems. It allows you to save and download Photos, Videos, Stories, Reels, or Profiles to your device quickly without installing software.</p>
-                <p>Mizofy Downloader helps you save and download media directly on your web browser. It works well on all platforms and devices from PC, Mac to phone (iPhone or Android).</p>
-            </div>
-
-            <div class="content-box">
-                <h2>Features of Mizofy</h2>
-                <div class="feature-grid">
-                    <div class="feature-item">
-                        <h4>High Quality</h4>
-                        <p>Download Photos, Videos from Instagram & TikTok with high quality: Full HD, 1080p, 2k, 4k.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>No Watermark</h4>
-                        <p>Download TikTok videos without the watermark clean and fast.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>Audio Extraction</h4>
-                        <p>Convert YouTube videos and Spotify tracks to MP3 audio instantly.</p>
-                    </div>
-                    <div class="feature-item">
-                        <h4>Completely Free</h4>
-                        <p>The tool is completely free. We do not collect user data and do not store download history.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-box">
-                <h2>How to use Mizofy Downloader?</h2>
-                <ol style="margin-left: 20px; color: #555;">
-                    <li>Open the App (Instagram, TikTok, YouTube) or website.</li>
-                    <li>Find and <strong>copy the link</strong> (URL) of the Photo, Video, Reels, or Song you want to download.</li>
-                    <li>Return to <strong>Mizofy</strong>, paste the copied URL into the input box.</li>
-                    <li>Press the <strong>"Download"</strong> button.</li>
-                    <li>Wait for our server to process, then click the <strong>Download File</strong> button to save it.</li>
-                </ol>
-            </div>
-
-            <div class="content-box">
-                <h2>Frequently Asked Questions</h2>
-                
-                <h3>What is Mizofy?</h3>
-                <p>Mizofy is a universal downloader tool, helping you to quickly download Photos, Videos, Reels, Stories, and Audio from social platforms to your phone or computer.</p>
-                
-                <h3>Does Mizofy work on iPhone/iPad?</h3>
-                <p>Yes. You can use the Safari browser on iOS or Chrome. Just paste the URL and click Download.</p>
-                
-                <h3>Do I need to log in?</h3>
-                <p>No, Mizofy does not require you to log in to any account. Using our downloader is safe and anonymous.</p>
-                
-                <h3>Is Mizofy free?</h3>
-                <p>Certainly. Mizofy is a free downloader. You can download photos and videos without any limits.</p>
-            </div>
-
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>© 2026 Mizofy. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact</a>
-            </div>
-            <p style="font-size: 0.8rem; margin-top: 15px; color: #999;">We are not affiliated with Instagram, Meta, TikTok or Google.</p>
-        </div>
-    </footer>
-
     <script>
-        const API_BASE = "https://instaaaa-pi.vercel.app/download";
-        const PROXY_1 = "https://corsproxy.io/?";
-        const PROXY_2 = "https://api.allorigins.win/raw?url=";
+        // --- CONFIGURATION ---
+        const PRIMARY_API = "https://instaaaa-pi.vercel.app/download";
+        // Agar Primary fail ho, toh yeh Backup API use karega (Cobalt Instance)
+        const BACKUP_API_URL = "https://api.cobalt.tools/api/json"; 
 
-        // Clipboard Paste Function
+        // --- PROXY LIST ---
+        const PROXIES = [
+            "", // 1. Direct (Sabse fast, agar API allow kare)
+            "https://corsproxy.io/?", // 2. CorsProxy (Reliable)
+            "https://api.allorigins.win/raw?url=", // 3. AllOrigins (GET only)
+            "https://thingproxy.freeboard.io/fetch/" // 4. ThingProxy (Backup)
+        ];
+
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -435,78 +45,108 @@
             // Start Loading
             loader.style.display = "block";
             submitBtn.disabled = true;
-            submitBtn.textContent = "Processing...";
+            submitBtn.textContent = "Connecting...";
 
-            try {
-                // Construct API URL
-                const apiTargetUrl = `${API_BASE}?url=${encodeURIComponent(url)}`;
-                
-                // Try Proxy 1
-                let data = await tryFetch(PROXY_1, apiTargetUrl);
-                
-                // If Proxy 1 fails, Try Proxy 2
-                if (!data) {
-                    console.log("Switching to backup server...");
-                    data = await tryFetch(PROXY_2, apiTargetUrl);
-                }
+            let mediaData = null;
 
-                if (!data) throw new Error("Connection failed");
-
-                const media = getMediaData(data);
-
-                if (media && media.link) {
-                    // Success
-                    document.getElementById('resTitle').textContent = media.title || "Universal Media";
-                    document.getElementById('resAuthor').textContent = media.desc || "Ready to Download";
-                    document.getElementById('dlButton').href = media.link;
-
-                    // Render Player
-                    if (media.type === "audio") {
-                        playerContainer.innerHTML = `
-                            <audio controls autoplay style="width:100%; margin-top:10px;">
-                                <source src="${media.link}" type="audio/mpeg">
-                                Your browser does not support audio.
-                            </audio>`;
-                    } else {
-                        // Video with Error Handler
-                        playerContainer.innerHTML = `
-                            <video controls autoplay playsinline class="media-preview" onerror="handleVideoError()">
-                                <source src="${media.link}" type="video/mp4">
-                                Your browser does not support video.
-                            </video>`;
+            // --- STRATEGY 1: TRY PRIMARY API WITH MULTIPLE PROXIES ---
+            for (const proxy of PROXIES) {
+                console.log(`Trying Proxy: ${proxy || "Direct"}...`);
+                try {
+                    // Construct URL
+                    const apiTarget = `${PRIMARY_API}?url=${encodeURIComponent(url)}`;
+                    const finalUrl = proxy + (proxy ? encodeURIComponent(apiTarget) : apiTarget);
+                    
+                    // Fetch
+                    const response = await fetch(finalUrl);
+                    if (response.ok) {
+                        const data = await response.json();
+                        mediaData = parseMediaData(data);
+                        if (mediaData && mediaData.link) break; // Found it! Stop searching.
                     }
-                    resultArea.style.display = "block";
-                } else {
-                    showError("❌ Media not found. Link might be private.");
+                } catch (e) {
+                    console.warn(`Proxy ${proxy} failed.`);
                 }
+            }
 
-            } catch (error) {
-                console.error("Error:", error);
-                showError("⚠️ Failed to connect. Please try again.");
-            } finally {
-                loader.style.display = "none";
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Download";
+            // --- STRATEGY 2: IF PRIMARY FAILS, TRY COBALT (BACKUP API) ---
+            if (!mediaData || !mediaData.link) {
+                console.log("Primary API failed. Switching to Cobalt Backup...");
+                submitBtn.textContent = "Trying Backup...";
+                try {
+                    const cobaltData = await fetchCobalt(url);
+                    if (cobaltData) {
+                        mediaData = {
+                            link: cobaltData.url,
+                            title: "Media File (Backup)",
+                            desc: "Downloaded via Mizofy Backup",
+                            type: "video" // Cobalt usually returns video
+                        };
+                    }
+                } catch (e) {
+                    console.error("Backup API failed", e);
+                }
+            }
+
+            // --- FINAL RENDER ---
+            loader.style.display = "none";
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Download";
+
+            if (mediaData && mediaData.link) {
+                // Success
+                document.getElementById('resTitle').textContent = mediaData.title || "Universal Media";
+                document.getElementById('resAuthor').textContent = mediaData.desc || "Ready";
+                document.getElementById('dlButton').href = mediaData.link;
+
+                if (mediaData.type === "audio") {
+                    playerContainer.innerHTML = `
+                        <audio controls autoplay style="width:100%; margin-top:10px;">
+                            <source src="${mediaData.link}" type="audio/mpeg">
+                        </audio>`;
+                } else {
+                    playerContainer.innerHTML = `
+                        <video controls autoplay playsinline class="media-preview" onerror="handleVideoError()">
+                            <source src="${mediaData.link}" type="video/mp4">
+                        </video>`;
+                }
+                resultArea.style.display = "block";
+            } else {
+                showError("❌ Server Busy. Please try again in 5 seconds.");
             }
         }
 
-        async function tryFetch(proxyBase, fullApiUrl) {
+        // Helper: Cobalt API (POST Request)
+        async function fetchCobalt(targetUrl) {
             try {
-                const finalUrl = proxyBase + encodeURIComponent(fullApiUrl);
-                const response = await fetch(finalUrl);
-                if (!response.ok) return null;
-                return await response.json();
+                const response = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://api.cobalt.tools/api/json"), {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        url: targetUrl,
+                        vQuality: "720",
+                        filenamePattern: "basic"
+                    })
+                });
+                const data = await response.json();
+                if (data.status === "stream" || data.status === "redirect") return data;
+                if (data.status === "picker") return data.picker[0];
+                return null;
             } catch (e) {
                 return null;
             }
         }
 
-        function getMediaData(data) {
+        // Helper: Parse Original API Data
+        function parseMediaData(data) {
             const results = data.all_results || data.results || data; 
             let metadata = {
                 link: data.clean_download_url || null,
-                title: data.title || "Media File",
-                desc: data.author ? `By: ${data.author}` : "Mizofy",
+                title: data.title,
+                desc: data.author,
                 type: "video"
             };
 
@@ -522,7 +162,6 @@
                             if (link && typeof link === 'string' && link.startsWith("http")) {
                                 if (link.includes("token=") && link.length < 60) continue;
                                 if ([".jpg", ".png", ".webp"].some(ext => link.toLowerCase().includes(ext))) continue;
-
                                 metadata.link = link;
                                 if (content.title) metadata.title = content.title;
                                 if (key === "mp3" || (data.platform && data.platform.toLowerCase().includes("spotify"))) {
@@ -548,6 +187,3 @@
             el.style.display = 'block';
         }
     </script>
-
-</body>
-</html>
