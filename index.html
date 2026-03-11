@@ -70,7 +70,7 @@
             try {
                 // We encode the URL to prevent "500 Internal Server Error"
                 const encodedUrl = encodeURIComponent(input.value);
-                const response = await fetch(`http://127.0.0.1:8000/download/${encodedUrl}`);
+                const response = await fetch(`https://tapi-e.vercel.app/download/${encodedUrl}`);
                 const data = await response.json();
 
                 if (data.success) {
