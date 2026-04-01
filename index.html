@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nimo TV Pop-up Player</title>
+    <title>Nimo TV Fixed Pop-up</title>
     <style>
-        /* Body setup to center the button */
         body {
             margin: 0;
             height: 100vh;
@@ -16,22 +15,20 @@
             font-family: sans-serif;
         }
 
-        /* Main Button */
         .open-btn {
             padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            background-color: #ff4500;
+            background-color: #7442ff;
             color: white;
             border: none;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Pop-up (Modal) background */
         .modal {
-            display: none; /* Default hidden */
+            display: none; 
             position: fixed; 
             z-index: 999; 
             left: 0;
@@ -43,24 +40,28 @@
             align-items: center;
         }
 
-        /* Player Container */
         .modal-content {
             position: relative;
             width: 90%;
-            max-width: 800px;
+            max-width: 850px;
             aspect-ratio: 16 / 9;
             background: #000;
+            border: 2px solid #7442ff; /* Player boundary */
         }
 
-        /* Close Button */
         .close-btn {
             position: absolute;
-            top: -40px;
+            top: -45px;
             right: 0;
             color: white;
-            font-size: 35px;
+            font-size: 40px;
             font-weight: bold;
             cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #ff4500;
         }
 
         iframe {
@@ -72,7 +73,7 @@
 </head>
 <body>
 
-    <button class="open-btn" onclick="openPlayer()">Watch Live Stream</button>
+    <button class="open-btn" onclick="openPlayer()">Open Stream</button>
 
     <div id="playerModal" class="modal">
         <div class="modal-content">
@@ -88,22 +89,19 @@
 
         function openPlayer() {
             modal.style.display = "flex";
-            iframe.src = videoUrl; // Load video only when opened
+            iframe.src = videoUrl;
         }
 
         function closePlayer() {
             modal.style.display = "none";
-            iframe.src = ""; // Stop video playback on close
+            iframe.src = "";
         }
 
-        // Close if user clicks outside the video box
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closePlayer();
-            }
-        }
+        /* Background click fix: 
+           Pehle yahan window.onclick wala code tha jo bahar click karne par band karta tha, 
+           usey ab puri tarah hata diya gaya hai.
+        */
     </script>
 
 </body>
-  </html>
-  
+</html>
