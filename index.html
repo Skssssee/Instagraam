@@ -12,37 +12,41 @@
         * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; user-select: none; }
         body { background-color: #0f172a; color: white; padding-bottom: 50px; }
 
-        /* UI Styling */
         .header { background: #1e293b; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .header .logo { color: #38bdf8; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+        .header .logo { color: #38bdf8; font-size: 28px; font-weight: 900; }
+
         .subtitle-box { background: #38bdf8; color: #0f172a; text-align: center; width: fit-content; margin: 15px auto; padding: 5px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
 
-        .match-card { background: #1e293b; margin: 15px; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .match-card:active { transform: scale(0.98); background: #334155; }
-        .match-name { font-size: 20px; font-weight: bold; color: #f8fafc; }
-        .live-dot { height: 10px; width: 10px; background-color: #ef4444; border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
+        .match-card { background: #1e293b; margin: 15px; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 20px; border-radius: 12px; cursor: pointer; }
+        .match-name { font-size: 20px; font-weight: bold; }
+        .live-dot { height: 10px; width: 10px; background-color: #ef4444; border-radius: 50%; display: inline-block; animation: blink 1s infinite; }
         
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* Telegram Modal */
+        /* Server Buttons inside Modal */
+        .server-switcher { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+        .srv-btn { background: #334155; color: white; border: 1px solid #38bdf8; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .srv-btn.active { background: #38bdf8; color: #000; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; flex-direction: column; }
+        .modal-content { position: relative; width: 100%; max-width: 1000px; }
+        .logo-hider { position: absolute; top: 15px; right: 15px; background: #38bdf8; color: #000; padding: 4px 12px; font-weight: 800; font-size: 12px; z-index: 10; border-radius: 4px; }
+        .close-btn { margin-bottom: 20px; color: white; font-size: 18px; cursor: pointer; background: #ef4444; padding: 5px 15px; border-radius: 5px; }
+
+        /* Telegram Styles */
         .tg-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .tg-modal-content { background: #1e293b; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #38bdf8; }
         .btn-tg-join { display: block; background: #0088cc; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 10px; }
-        .btn-tg-cancel { background: #475569; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
-
-        /* Player Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; }
-        .modal-content { position: relative; width: 100%; max-width: 1000px; }
-        .logo-hider { position: absolute; top: 15px; right: 15px; background: #38bdf8; color: #000; padding: 4px 12px; font-weight: 800; font-size: 12px; z-index: 10; border-radius: 4px; pointer-events: none; }
-        .close-btn { position: absolute; top: -50px; right: 10px; color: white; font-size: 30px; cursor: pointer; }
-
-        .footer-tg { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #334155; }
-        .tg-footer-link { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; margin-top: 10px; }
+        
+        .footer-tg { text-align: center; margin-top: 40px; padding: 20px; }
+        .tg-footer-link { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; }
 
         .video-js { width: 100%; aspect-ratio: 16/9; }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div class="header">
+<body oncontextmenu="return false;">
+
+    <div class="header">
         <div style="font-size: 20px;">☰</div>
         <div class="logo">Mizofy TV</div>
         <div style="font-size: 20px;">🌙</div>
@@ -71,18 +75,25 @@
     <div id="tgModal" class="tg-modal">
         <div class="tg-modal-content">
             <h3>Join for Updates?</h3>
-            <p style="margin: 15px 0; font-size: 14px; color: #94a3b8;">Get the latest working links directly on Telegram!</p>
+            <p style="margin: 15px 0; font-size: 14px; color: #94a3b8;">If a link shows 403 error, check Telegram for new links!</p>
             <a href="https://t.me/+r_2nbarfWuVmYzU9" target="_blank" class="btn-tg-join" onclick="proceedToStream()">Join Now</a>
-            <button class="btn-tg-cancel" onclick="proceedToStream()">Continue to Stream</button>
+            <button style="background:#475569; color:white; width:100%; padding:10px; border:none; border-radius:8px;" onclick="proceedToStream()">Continue to Stream</button>
         </div>
     </div>
 
     <div id="playerModal" class="modal">
+        <div class="close-btn" onclick="closePlayer()">✕ Close Player</div>
+        
+        <div class="server-switcher">
+            <button class="srv-btn active" onclick="switchServer(1, this)">Server 1 (Global)</button>
+            <button class="srv-btn" onclick="switchServer(2, this)">Server 2 (US Only)</button>
+        </div>
+
         <div class="modal-content">
-            <span class="close-btn" onclick="closePlayer()">&times; Close</span>
             <div class="logo-hider">Mizofy TV</div>
             <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"></video>
         </div>
+        <p id="error-msg" style="color: #ef4444; margin-top: 15px; font-size: 12px; display:none;">Error 403? Try switching to Server 1.</p>
     </div>
 
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
@@ -90,30 +101,43 @@
     <script src="https://unpkg.com/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
-        // LAYER 2: Block F12, Ctrl+U, Ctrl+Shift+I
-        document.onkeydown = function(e) {
-            if (e.keyCode == 123 || 
-                (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) || 
-                (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
-                return false;
-            }
+        // Security logic
+        document.onkeydown = function(e) { if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false; };
+
+        // Server Links (Encoded to hide from F12)
+        const servers = {
+            1: "aHR0cHM6Ly9hbWcwMTI2OS1hbWcwMTI2OWMxLXNwb3J0c3RyaWJhbC1lbWVhLTUyMDQucGxheW91dHMubm93LmFtYWdpLnR2L3BsYXlsaXN0L2FtZzAxMjY5LXdpbGxvd3R2ZmFzdC13aWxsb3dwbHVzLXNwb3J0c3RyaWJhbGVtZWEvcGxheWxpc3QubTN1OA==", // EMEA/Global
+            2: "aHR0cHM6Ly9hbWcwMTI2OS1hbWcwMTI2OWMxLWRpc3Ryb3R2LXVzLTUzNzkucGxheW91dHMubm93LmFtYWdpLnR2L3BsYXlsaXN0L2FtZzAxMjY5LXdpbGxvd3R2ZmFzdC13aWxsb3dwbHVzLWRpc3Ryb3R2dXMvcGxheWxpc3QubTN1OA=="  // US Only
         };
 
-        // LAYER 3: Encode the Link in Base64 (Scrambled)
-        const secret = "aHR0cHM6Ly9hbWcwMTI2OS1hbWcwMTI2OWMxLWRpc3Ryb3R2LXVzLTUzNzkucGxheW91dHMubm93LmFtYWdpLnR2L3BsYXlsaXN0L2FtZzAxMjY5LXdpbGxvd3R2ZmFzdC13aWxsb3dwbHVzLWRpc3Ryb3R2dXMvcGxheWxpc3QubTN1OA==";
-        
         const tgModal = document.getElementById('tgModal');
         const playerModal = document.getElementById('playerModal');
+        const errorMsg = document.getElementById('error-msg');
+        
         let player = videojs('my-video', { fluid: true, liveui: true });
         player.hlsQualitySelector({ displayCurrentQuality: true });
+
+        // Handle playback errors (like 403)
+        player.on('error', function() {
+            errorMsg.style.display = "block";
+        });
 
         function promptTelegram() { tgModal.style.display = "flex"; }
         
         function proceedToStream() {
             tgModal.style.display = "none";
             playerModal.style.display = "flex";
-            // Decode link only when player opens
-            player.src({ src: atob(secret), type: 'application/x-mpegURL' });
+            switchServer(1, document.querySelector('.srv-btn')); // Default to Global
+        }
+
+        function switchServer(id, btn) {
+            errorMsg.style.display = "none";
+            // Update Active Button UI
+            document.querySelectorAll('.srv-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Load selected server
+            player.src({ src: atob(servers[id]), type: 'application/x-mpegURL' });
             player.play();
         }
 
