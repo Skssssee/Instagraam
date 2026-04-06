@@ -6,153 +6,128 @@
     <title>Mizofy TV - Live Sports</title>
     
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-    <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
+    <link href="https://unpkg.com/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.css" rel="stylesheet">
 
     <style>
         * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
-        body { background-color: #f0f2f5; padding-bottom: 50px; }
+        body { background-color: #0f172a; color: white; padding-bottom: 50px; }
 
-        /* Header Styles */
-        .header {
-            background: white; padding: 10px 15px; display: flex;
-            justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd;
-        }
-        .header .logo { color: #2b59ff; font-size: 32px; font-weight: 900; }
-        .menu-icon, .theme-icon { background: #3b5998; color: white; padding: 8px; border-radius: 8px; font-size: 20px; }
-
-        .subtitle-box {
-            background: #2b59ff; color: white; text-align: center;
-            width: fit-content; margin: 5px auto; padding: 5px 20px;
-            border-radius: 5px; font-weight: bold; font-size: 18px;
-        }
-
-        .nav-buttons { display: flex; justify-content: space-around; padding: 15px 10px; gap: 10px; }
-        .nav-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; color: white; cursor: pointer; }
-        .btn-blue { background: #3b5998; opacity: 0.8; }
-        .btn-dark { background: #333; }
-
-        .schedule-bar { background: red; color: white; text-align: center; padding: 8px; font-weight: bold; font-size: 18px; text-transform: uppercase; }
-
-        /* IPL Card */
-        .match-card {
-            background: white; margin: 15px; border: 2px solid #000;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; border-radius: 5px; cursor: pointer;
-        }
-        .match-name { font-size: 22px; font-weight: bold; color: #333; }
-        .live-icon { text-align: center; font-size: 12px; font-weight: bold; color: red; }
-
-        /* MODAL PLAYER */
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-            width: 100%; height: 100%; background-color: rgba(0,0,0,0.98);
-            justify-content: center; align-items: center;
-        }
-        .modal-content {
-            position: relative; width: 100%; max-width: 900px;
-            background: #000; border: 1px solid #444;
-        }
+        /* Header */
+        .header { background: #1e293b; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .header .logo { color: #38bdf8; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
         
-        /* LOGO HIDER OVERLAY */
-        .logo-hider {
-            position: absolute; top: 10px; right: 10px;
-            background: #2b59ff; color: white; padding: 6px 14px;
-            font-weight: bold; font-size: 14px; z-index: 100;
-            border-radius: 4px; pointer-events: none;
-        }
+        .subtitle-box { background: #38bdf8; color: #0f172a; text-align: center; width: fit-content; margin: 15px auto; padding: 5px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
 
-        .close-btn {
-            position: absolute; top: -50px; right: 10px; color: white;
-            font-size: 40px; font-weight: bold; cursor: pointer; z-index: 1001;
-        }
+        /* Match Card */
+        .match-card { background: #1e293b; margin: 15px; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .match-card:active { transform: scale(0.98); background: #334155; }
+        .match-name { font-size: 20px; font-weight: bold; color: #f8fafc; }
+        .live-dot { height: 10px; width: 10px; background-color: #ef4444; border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
+        
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* Video.js Customization */
+        /* TELEGRAM PROMPT MODAL */
+        .tg-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .tg-modal-content { background: #1e293b; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #38bdf8; }
+        .tg-modal-content h3 { margin-bottom: 15px; color: #38bdf8; }
+        .tg-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn-tg-join { background: #0088cc; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        .btn-tg-cancel { background: #475569; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+
+        /* PLAYER MODAL */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,1); justify-content: center; align-items: center; }
+        .modal-content { position: relative; width: 100%; max-width: 1000px; background: #000; }
+        .logo-hider { position: absolute; top: 15px; right: 15px; background: #38bdf8; color: #000; padding: 4px 12px; font-weight: 800; font-size: 12px; z-index: 10; border-radius: 4px; pointer-events: none; text-transform: uppercase; }
+        .close-btn { position: absolute; top: -50px; right: 10px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
+
+        /* Footer Telegram Section */
+        .footer-tg { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #334155; }
+        .footer-tg h4 { color: #94a3b8; margin-bottom: 10px; }
+        .tg-footer-link { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; }
+
         .video-js { width: 100%; aspect-ratio: 16/9; }
-        .vjs-big-play-button { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="menu-icon">☰</div>
+        <div style="font-size: 20px;">☰</div>
         <div class="logo">Mizofy TV</div>
-        <div class="theme-icon">🌙</div>
+        <div style="font-size: 20px;">🌙</div>
     </div>
 
-    <div class="subtitle-box">Live Sports & Update</div>
+    <div class="subtitle-box">Live Cricket & Sports</div>
 
-    <div class="nav-buttons">
-        <button class="nav-btn btn-blue">••••</button>
-        <button class="nav-btn btn-dark">Today Live</button>
-        <button class="nav-btn btn-blue">••••</button>
-    </div>
-
-    <div class="schedule-bar">ALL Schedule</div>
-
-    <div class="match-card" onclick="openPlayer()">
+    <div class="match-card" onclick="promptTelegram()">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-size: 30px;">🏏</span>
-            <span class="match-name">IPL 2026</span>
+            <span style="font-size: 32px;">🏏</span>
+            <div>
+                <div class="match-name">IPL 2026 LIVE</div>
+                <div style="font-size: 12px; color: #94a3b8;">Mizofy</div>
+            </div>
         </div>
-        <div class="live-icon">
-            <span style="font-size: 24px;">📍</span><br>LIVE
+        <div style="text-align: right; color: #ef4444; font-weight: bold; font-size: 14px;">
+            <span class="live-dot"></span> LIVE
+        </div>
+    </div>
+
+    <div class="footer-tg">
+        <h4>Join Updates Join Telegram</h4>
+        <a href="https://t.me/+r_2nbarfWuVmYzU9" target="_blank" class="tg-footer-link">Join Telegram</a>
+    </div>
+
+    <div id="tgModal" class="tg-modal">
+        <div class="tg-modal-content">
+            <h3>Join for Updates?</h3>
+            <p style="font-size: 14px; color: #94a3b8;">Join our Telegram channel for the latest match links and live updates!</p>
+            <div class="tg-btn-group">
+                <a href="https://t.me/+r_2nbarfWuVmYzU9" target="_blank" class="btn-tg-join" onclick="proceedToStream()">Join Now</a>
+                <button class="btn-tg-cancel" onclick="proceedToStream()">Maybe Later (Continue to Stream)</button>
+            </div>
         </div>
     </div>
 
     <div id="playerModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closePlayer()">&times;</span>
+            <span class="close-btn" onclick="closePlayer()">&times; Close</span>
             <div class="logo-hider">Mizofy TV</div>
-            
-            <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" data-setup='{}'>
-                <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video</p>
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+                <p class="vjs-no-js">To view this video please enable JavaScript.</p>
             </video>
         </div>
     </div>
 
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-    <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/quality-selector.min.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-quality-levels@4.1.0/dist/videojs-contrib-quality-levels.min.js"></script>
+    <script src="https://unpkg.com/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
-        const modal = document.getElementById('playerModal');
-        let player;
-
-        // The M3U8 Stream URL
+        const tgModal = document.getElementById('tgModal');
+        const playerModal = document.getElementById('playerModal');
         const streamUrl = "https://amg01269-amg01269c1-distrotv-us-5379.playouts.now.amagi.tv/playlist/amg01269-willowtvfast-willowplus-distrotvus/playlist.m3u8";
+        
+        let player = videojs('my-video', {
+            autoplay: false,
+            fluid: true,
+            responsive: true,
+            liveui: true
+        });
+
+        player.hlsQualitySelector({ displayCurrentQuality: true });
+
+        // Step 1: User clicks Match Card, show TG Prompt
+        function promptTelegram() {
+            tgModal.style.display = "flex";
+        }
+
+        // Step 2: After choosing (Join or Cancel), hide prompt and show stream
+        function proceedToStream() {
+            tgModal.style.display = "none";
+            openPlayer();
+        }
 
         function openPlayer() {
-            modal.style.display = "flex";
-
-            // Initialize Player if not already done
-            if (!player) {
-                player = videojs('my-video', {
-                    autoplay: true,
-                    fluid: true,
-                    controlBar: {
-                        children: [
-                            'playToggle',
-                            'volumePanel',
-                            'currentTimeDisplay',
-                            'timeDivider',
-                            'durationDisplay',
-                            'progressControl',
-                            'liveDisplay',
-                            'remainingTimeDisplay',
-                            'customControlSpacer',
-                            'playbackRateMenuButton',
-                            'chaptersButton',
-                            'descriptionsButton',
-                            'subsCapsButton',
-                            'audioTrackButton',
-                            'fullscreenToggle',
-                        ],
-                    },
-                });
-                
-                // Add Quality Selector (The gear icon)
-                player.controlBar.addChild('QualitySelector');
-            }
-
+            playerModal.style.display = "flex";
             player.src({
                 src: streamUrl,
                 type: 'application/x-mpegURL'
@@ -161,11 +136,9 @@
         }
 
         function closePlayer() {
-            modal.style.display = "none";
-            if (player) {
-                player.pause();
-                player.src(""); // Stops loading data
-            }
+            playerModal.style.display = "none";
+            player.pause();
+            player.src(""); 
         }
     </script>
 
