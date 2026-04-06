@@ -4,45 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mizofy TV - Live Sports</title>
+    
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
+
     <style>
         * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
         body { background-color: #f0f2f5; padding-bottom: 50px; }
 
         /* Header Styles */
         .header {
-            background: white;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #ddd;
+            background: white; padding: 10px 15px; display: flex;
+            justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd;
         }
         .header .logo { color: #2b59ff; font-size: 32px; font-weight: 900; }
-        .menu-icon, .theme-icon {
-            background: #3b5998; color: white; padding: 8px; border-radius: 8px; font-size: 20px;
-        }
+        .menu-icon, .theme-icon { background: #3b5998; color: white; padding: 8px; border-radius: 8px; font-size: 20px; }
 
-        /* Subtitle */
         .subtitle-box {
             background: #2b59ff; color: white; text-align: center;
             width: fit-content; margin: 5px auto; padding: 5px 20px;
             border-radius: 5px; font-weight: bold; font-size: 18px;
         }
 
-        /* Nav Buttons */
         .nav-buttons { display: flex; justify-content: space-around; padding: 15px 10px; gap: 10px; }
-        .nav-btn {
-            flex: 1; padding: 12px; border-radius: 8px; border: none;
-            font-weight: bold; font-size: 16px; color: white; cursor: pointer;
-        }
+        .nav-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; color: white; cursor: pointer; }
         .btn-blue { background: #3b5998; opacity: 0.8; }
         .btn-dark { background: #333; }
 
-        /* Schedule Bar */
-        .schedule-bar {
-            background: red; color: white; text-align: center;
-            padding: 8px; font-weight: bold; font-size: 18px; text-transform: uppercase;
-        }
+        .schedule-bar { background: red; color: white; text-align: center; padding: 8px; font-weight: bold; font-size: 18px; text-transform: uppercase; }
 
         /* IPL Card */
         .match-card {
@@ -50,17 +39,8 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 15px; border-radius: 5px; cursor: pointer;
         }
-        .match-info { display: flex; align-items: center; gap: 15px; }
         .match-name { font-size: 22px; font-weight: bold; color: #333; }
         .live-icon { text-align: center; font-size: 12px; font-weight: bold; color: red; }
-
-        /* Telegram Section */
-        .telegram-section { text-align: center; margin-top: 30px; }
-        .tg-link {
-            display: inline-block; background: #0088cc; color: white;
-            text-decoration: none; padding: 12px 25px; border-radius: 30px;
-            font-weight: bold; font-size: 18px; margin-top: 10px;
-        }
 
         /* MODAL PLAYER */
         .modal {
@@ -69,14 +49,26 @@
             justify-content: center; align-items: center;
         }
         .modal-content {
-            position: relative; width: 100%; max-width: 900px; aspect-ratio: 16/9;
+            position: relative; width: 100%; max-width: 900px;
             background: #000; border: 1px solid #444;
         }
+        
+        /* LOGO HIDER OVERLAY */
+        .logo-hider {
+            position: absolute; top: 10px; right: 10px;
+            background: #2b59ff; color: white; padding: 6px 14px;
+            font-weight: bold; font-size: 14px; z-index: 100;
+            border-radius: 4px; pointer-events: none;
+        }
+
         .close-btn {
             position: absolute; top: -50px; right: 10px; color: white;
             font-size: 40px; font-weight: bold; cursor: pointer; z-index: 1001;
         }
-        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Video.js Customization */
+        .video-js { width: 100%; aspect-ratio: 16/9; }
+        .vjs-big-play-button { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); }
     </style>
 </head>
 <body>
@@ -98,7 +90,7 @@
     <div class="schedule-bar">ALL Schedule</div>
 
     <div class="match-card" onclick="openPlayer()">
-        <div class="match-info">
+        <div style="display: flex; align-items: center; gap: 15px;">
             <span style="font-size: 30px;">🏏</span>
             <span class="match-name">IPL 2026</span>
         </div>
@@ -107,39 +99,74 @@
         </div>
     </div>
 
-    <div class="telegram-section">
-        <h3>More Updates Here</h3>
-        <a href="https://t.me/+r_2nbarfWuVmYzU9" class="tg-link" target="_blank">Join Telegram</a>
-    </div>
-
     <div id="playerModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closePlayer()">&times;</span>
-            <iframe id="nimoIframe" src="" 
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" 
-                allowfullscreen="true" 
-                webkitallowfullscreen="true" 
-                mozallowfullscreen="true">
-            </iframe>
+            <div class="logo-hider">Mizofy TV</div>
+            
+            <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" data-setup='{}'>
+                <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video</p>
+            </video>
         </div>
     </div>
 
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/quality-selector.min.js"></script>
+
     <script>
         const modal = document.getElementById('playerModal');
-        const iframe = document.getElementById('nimoIframe');
-        const videoUrl = "https://amg01269-amg01269c1-sportstribal-emea-5204.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg01269-willowtvfast-willowplus-sportstribalemea/cb543e1c786c64869bd43d6ecef048a7f9a653fc087a8d6933fb4b926bc10f41f9e5af86a540ff1902cb5d81385e7d505b6cdb7ba31402cfd97ab82371254b2085ead279a887100cb2de0f2f34b37b1b48ee7f5590790645dceb31019172e02a525dbb5f2e1e19a58924d16a4299d951de6f5edefe863e206d2907dd0200b0bf5fa7f9ff5d5bdf6aa9b10249932b559add10908849abe3850dcf01df69f4179a8cf38dc104808e986bfd02b760440b732dc1cd28c2cf0cfbdb983a6ad12529141c03b1f1c6fd1f6fdf75543697975d60488571e7a767e44939bf09993deb5ae84a99796c65d3c2d7dffe514838dea933bda38c97c7b8f43a21b663fee09cb59d88a184764d73b306ed363f3982fcc01c85cd11dcde49e3e63d4a6e96c617d8f51ae29ef5ebab6906619ad4e1f86c6e100515b57de8f64cc820dc3783c11f2a5d5945974834ae76b8733f78468a8c5f9b4655e99bc3afd6002ed23b5b7be664cb540c688c653a27a51fd4a26f34de764aa72034f75c7aa272ae9962a7f28bb3566efb8e9617b62fcea51adef335ac6f175016fca77f080b1f2b90a64d250454ef09a4dfc3ea724927e9f4c6f189131b0f2b185f09c4b3b326d5de8e7e4b4e911d773620503a9906df65da407a0128c80cdae35c27d248727b94ca553a7b6292dabe8883a4a815e305bd8d91142039506fb873352e61ddb3873ba46eab1ff7b12aa1022d6bd3227ea033c6f8bbd767cec9e14d/96/384x216_734654/index.m3u8";
+        let player;
+
+        // The M3U8 Stream URL
+        const streamUrl = "https://amg01269-amg01269c1-distrotv-us-5379.playouts.now.amagi.tv/playlist/amg01269-willowtvfast-willowplus-distrotvus/playlist.m3u8";
 
         function openPlayer() {
             modal.style.display = "flex";
-            iframe.src = videoUrl;
+
+            // Initialize Player if not already done
+            if (!player) {
+                player = videojs('my-video', {
+                    autoplay: true,
+                    fluid: true,
+                    controlBar: {
+                        children: [
+                            'playToggle',
+                            'volumePanel',
+                            'currentTimeDisplay',
+                            'timeDivider',
+                            'durationDisplay',
+                            'progressControl',
+                            'liveDisplay',
+                            'remainingTimeDisplay',
+                            'customControlSpacer',
+                            'playbackRateMenuButton',
+                            'chaptersButton',
+                            'descriptionsButton',
+                            'subsCapsButton',
+                            'audioTrackButton',
+                            'fullscreenToggle',
+                        ],
+                    },
+                });
+                
+                // Add Quality Selector (The gear icon)
+                player.controlBar.addChild('QualitySelector');
+            }
+
+            player.src({
+                src: streamUrl,
+                type: 'application/x-mpegURL'
+            });
+            player.play();
         }
 
         function closePlayer() {
             modal.style.display = "none";
-            iframe.src = "";
+            if (player) {
+                player.pause();
+                player.src(""); // Stops loading data
+            }
         }
-        
-        // No side-click exit logic here.
     </script>
 
 </body>
