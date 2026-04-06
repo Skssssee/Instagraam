@@ -9,48 +9,40 @@
     <link href="https://unpkg.com/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.css" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
+        * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; user-select: none; }
         body { background-color: #0f172a; color: white; padding-bottom: 50px; }
 
-        /* Header */
+        /* UI Styling */
         .header { background: #1e293b; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .header .logo { color: #38bdf8; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
-        
         .subtitle-box { background: #38bdf8; color: #0f172a; text-align: center; width: fit-content; margin: 15px auto; padding: 5px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
 
-        /* Match Card */
         .match-card { background: #1e293b; margin: 15px; border: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
         .match-card:active { transform: scale(0.98); background: #334155; }
         .match-name { font-size: 20px; font-weight: bold; color: #f8fafc; }
         .live-dot { height: 10px; width: 10px; background-color: #ef4444; border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
         
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* TELEGRAM PROMPT MODAL */
-        .tg-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        /* Telegram Modal */
+        .tg-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .tg-modal-content { background: #1e293b; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #38bdf8; }
-        .tg-modal-content h3 { margin-bottom: 15px; color: #38bdf8; }
-        .tg-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-tg-join { background: #0088cc; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; }
-        .btn-tg-cancel { background: #475569; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-tg-join { display: block; background: #0088cc; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 10px; }
+        .btn-tg-cancel { background: #475569; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
 
-        /* PLAYER MODAL */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,1); justify-content: center; align-items: center; }
-        .modal-content { position: relative; width: 100%; max-width: 1000px; background: #000; }
-        .logo-hider { position: absolute; top: 15px; right: 15px; background: #38bdf8; color: #000; padding: 4px 12px; font-weight: 800; font-size: 12px; z-index: 10; border-radius: 4px; pointer-events: none; text-transform: uppercase; }
-        .close-btn { position: absolute; top: -50px; right: 10px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
+        /* Player Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; }
+        .modal-content { position: relative; width: 100%; max-width: 1000px; }
+        .logo-hider { position: absolute; top: 15px; right: 15px; background: #38bdf8; color: #000; padding: 4px 12px; font-weight: 800; font-size: 12px; z-index: 10; border-radius: 4px; pointer-events: none; }
+        .close-btn { position: absolute; top: -50px; right: 10px; color: white; font-size: 30px; cursor: pointer; }
 
-        /* Footer Telegram Section */
         .footer-tg { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #334155; }
-        .footer-tg h4 { color: #94a3b8; margin-bottom: 10px; }
-        .tg-footer-link { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; }
+        .tg-footer-link { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 10px 25px; border-radius: 30px; font-weight: bold; margin-top: 10px; }
 
         .video-js { width: 100%; aspect-ratio: 16/9; }
     </style>
 </head>
-<body>
-
-    <div class="header">
+<body oncontextmenu="return false;"> <div class="header">
         <div style="font-size: 20px;">☰</div>
         <div class="logo">Mizofy TV</div>
         <div style="font-size: 20px;">🌙</div>
@@ -79,11 +71,9 @@
     <div id="tgModal" class="tg-modal">
         <div class="tg-modal-content">
             <h3>Join for Updates?</h3>
-            <p style="font-size: 14px; color: #94a3b8;">Join our Telegram channel for the latest match links and live updates!</p>
-            <div class="tg-btn-group">
-                <a href="https://t.me/+r_2nbarfWuVmYzU9" target="_blank" class="btn-tg-join" onclick="proceedToStream()">Join Now</a>
-                <button class="btn-tg-cancel" onclick="proceedToStream()">Maybe Later (Continue to Stream)</button>
-            </div>
+            <p style="margin: 15px 0; font-size: 14px; color: #94a3b8;">Get the latest working links directly on Telegram!</p>
+            <a href="https://t.me/+r_2nbarfWuVmYzU9" target="_blank" class="btn-tg-join" onclick="proceedToStream()">Join Now</a>
+            <button class="btn-tg-cancel" onclick="proceedToStream()">Continue to Stream</button>
         </div>
     </div>
 
@@ -91,9 +81,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closePlayer()">&times; Close</span>
             <div class="logo-hider">Mizofy TV</div>
-            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
-                <p class="vjs-no-js">To view this video please enable JavaScript.</p>
-            </video>
+            <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"></video>
         </div>
     </div>
 
@@ -102,36 +90,30 @@
     <script src="https://unpkg.com/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
+        // LAYER 2: Block F12, Ctrl+U, Ctrl+Shift+I
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123 || 
+                (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) || 
+                (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
+                return false;
+            }
+        };
+
+        // LAYER 3: Encode the Link in Base64 (Scrambled)
+        const secret = "aHR0cHM6Ly9hbWcwMTI2OS1hbWcwMTI2OWMxLWRpc3Ryb3R2LXVzLTUzNzkucGxheW91dHMubm93LmFtYWdpLnR2L3BsYXlsaXN0L2FtZzAxMjY5LXdpbGxvd3R2ZmFzdC13aWxsb3dwbHVzLWRpc3Ryb3R2dXMvcGxheWxpc3QubTN1OA==";
+        
         const tgModal = document.getElementById('tgModal');
         const playerModal = document.getElementById('playerModal');
-        const streamUrl = "https://amg01269-amg01269c1-distrotv-us-5379.playouts.now.amagi.tv/playlist/amg01269-willowtvfast-willowplus-distrotvus/playlist.m3u8";
-        
-        let player = videojs('my-video', {
-            autoplay: false,
-            fluid: true,
-            responsive: true,
-            liveui: true
-        });
-
+        let player = videojs('my-video', { fluid: true, liveui: true });
         player.hlsQualitySelector({ displayCurrentQuality: true });
 
-        // Step 1: User clicks Match Card, show TG Prompt
-        function promptTelegram() {
-            tgModal.style.display = "flex";
-        }
-
-        // Step 2: After choosing (Join or Cancel), hide prompt and show stream
+        function promptTelegram() { tgModal.style.display = "flex"; }
+        
         function proceedToStream() {
             tgModal.style.display = "none";
-            openPlayer();
-        }
-
-        function openPlayer() {
             playerModal.style.display = "flex";
-            player.src({
-                src: streamUrl,
-                type: 'application/x-mpegURL'
-            });
+            // Decode link only when player opens
+            player.src({ src: atob(secret), type: 'application/x-mpegURL' });
             player.play();
         }
 
@@ -141,6 +123,5 @@
             player.src(""); 
         }
     </script>
-
 </body>
 </html>
